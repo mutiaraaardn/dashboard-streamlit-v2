@@ -6,6 +6,7 @@ share of respondents (%).
 
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
 
 from components.cards import kpi_card
@@ -109,18 +110,51 @@ def render_kpis(df):
         kpi_card("account_tree", "Multi-Bank Users", f"{multi_pct:.1f}%", sub_text="use more than one bank", accent=ICON["soft"])
 
 
+def _lollipop_h(box, counts, total, top_n=10):
+    """Horizontal lollipop: thin stem + value-coloured dot, labelled 'count (pct%)'.
+
+    The x-axis is the mention count; the share of respondents is shown in the label.
+    """
+    if counts.empty or total == 0:
+        empty_state(box); return
+    counts = counts.head(top_n).sort_values(ascending=True)
+    data = counts.reset_index()
+    data.columns = ["Bank", "Count"]
+    data["pct"] = (data["Count"] / total * 100).round(1)
+    data["label"] = data["Count"].astype(int).astype(str) + " (" + data["pct"].astype(str) + "%)"
+
+    fig = go.Figure()
+    for _, r in data.iterrows():
+        fig.add_shape(type="line", x0=0, x1=r["Count"], y0=r["Bank"], y1=r["Bank"],
+                      line=dict(color="#dbe6f0", width=2))
+    max_x = data["Count"].max()
+    fig.add_trace(go.Scatter(
+        x=data["Count"], y=data["Bank"], mode="markers+text",
+        marker=dict(size=15, color=data["Count"], colorscale=PALETTE_CONTINUOUS,
+                    line=dict(color="white", width=1.5)),
+        text=data["label"], textposition="middle right", textfont=dict(size=11, color="#0f172a"),
+        customdata=data["pct"],
+        hovertemplate="<b>%{y}</b><br>%{x} mentions (%{customdata}%)<extra></extra>",
+    ))
+    fig = base_layout(fig, height=max(330, 30 * len(data) + 70), margin=dict(l=10, r=110, t=20, b=40))
+    fig.update_xaxes(title="Number of mentions", range=[0, max_x * 1.22] if max_x else [0, 1],
+                     showgrid=True, gridcolor="#eef2f7")
+    fig.update_yaxes(title=None)
+    plot(box, fig)
+
+
 def render_used_banks(df):
-    box = chart_card("Most Frequently Used Banks", "Share of respondents using each bank",
+    box = chart_card("Most Frequently Used Banks", "Number of mentions (share of respondents)",
                      icon=("account_balance", "dark", 18))
-    _pct_hbar(box, _explode(df, "A1A").value_counts(), len(df), top_n=10)
+    _lollipop_h(box, _explode(df, "A1A").value_counts(), len(df), top_n=10)
 
 
 def render_competitors(df):
-    box = chart_card("Top Competitors", "Share of respondents naming each competitor",
+    box = chart_card("Top Competitors", "Number of mentions (share of respondents)",
                      icon=("leaderboard", "teal", 18))
     counts = df["KOMP"].dropna().astype(str) if "KOMP" in df.columns else pd.Series(dtype=str)
     counts = counts[counts.str.strip() != ""].value_counts()
-    _pct_hbar(box, counts, len(df), top_n=10)
+    _lollipop_h(box, counts, len(df), top_n=10)
 
 
 def render_savings_vs_transaction(df):
@@ -243,9 +277,6 @@ def render_usage_competitor(df, labels=None, mode="Mean"):
         render_used_banks(df)
     with c2:
         render_competitors(df)
-
-    spacer()
-    render_savings_vs_transaction(df)
 
     spacer()
     c3, c4 = st.columns(2)
