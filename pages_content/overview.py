@@ -73,13 +73,13 @@ def render_map(df, labels, mode):
     box = st.container(border=True)
     box.markdown(
         '<div class="chart-title">' + mi("map", ICON["dark"], 18) +
-        "Regional Map — NPS &amp; CSI by City/Regency</div>", unsafe_allow_html=True)
+        "Regional Map: NPS &amp; CSI</div>", unsafe_allow_html=True)
 
     # Choose which metric colours the regions.
     color_by = box.radio("Colour regions by", ["NPS", "CSI"], horizontal=True,
                          key="map_color_by", label_visibility="collapsed")
     box.markdown(
-        f'<div class="chart-subtitle">Each region (kabupaten/kota) is shaded by its average '
+        f'<div class="chart-subtitle">Each region is shaded by its average '
         f'<b>{color_by}</b>. Click a region to list all its branches with NPS &amp; CSI.</div>',
         unsafe_allow_html=True)
 
@@ -149,7 +149,7 @@ def render_map(df, labels, mode):
 
 
 def render_touchpoint_scores(overall, mode):
-    box = chart_card("Touchpoint Performance — Bank XYZ",
+    box = chart_card("Touchpoint Performance (Bank XYZ)",
                      f"Overall {T.metric_axis_title(mode).lower()} across all branches",
                      icon=("insights", "dark", 18))
     data = overall[["attribute", "xyz"]].dropna(subset=["xyz"]).sort_values("xyz")

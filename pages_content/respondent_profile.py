@@ -49,11 +49,12 @@ def _donut(box, counts, total, center_label="Total"):
                  color_discrete_sequence=["#0A4174", "#7BBDE8", "#49769F", "#BDD8E9", "#6EA2B3"])
     fig.update_traces(textposition="inside", textinfo="percent",
                       insidetextorientation="horizontal", textfont_size=13,
-                      marker=dict(line=dict(color="#ffffff", width=2)))
-    fig.update_layout(height=330, margin=dict(l=10, r=10, t=10, b=10), paper_bgcolor="white",
+                      marker=dict(line=dict(color="#ffffff", width=2)),
+                      domain=dict(x=[0, 1], y=[0.18, 1]))
+    fig.update_layout(height=340, margin=dict(l=10, r=10, t=20, b=20), paper_bgcolor="white",
                       showlegend=True, font=dict(color="#0f172a", size=12),
-                      legend=dict(orientation="h", yanchor="bottom", y=-0.08, xanchor="center", x=0.5),
-                      annotations=[dict(text=f"<b>{total:,}</b><br>{center_label}", x=0.5, y=0.5,
+                      legend=dict(orientation="h", yanchor="top", y=0.12, xanchor="center", x=0.5),
+                      annotations=[dict(text=f"<b>{total:,}</b><br>{center_label}", x=0.5, y=0.59,
                                         font_size=15, showarrow=False)])
     plot(box, fig)
 
@@ -235,11 +236,11 @@ def render_insights(df):
 
 def render_respondent_profile(df, labels=None, mode="Mean"):
     load_icon_font()
-    page_header("Respondent Profile", "Demographic characteristics and banking behaviour of the survey sample")
+    page_header("Customer Respondent", "Demographic characteristics and banking behaviour of the survey sample")
     render_kpis(df)
 
     spacer(28)
-    r1c1, r1c2, r1c3 = st.columns([1.3, 0.85, 0.85])
+    r1c1, r1c2, r1c3 = st.columns([1.2, 1, 1])
     with r1c1:
         render_age(df)
     with r1c2:
