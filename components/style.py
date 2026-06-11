@@ -273,57 +273,63 @@ def load_css():
 
 
     /* =====================================================
-       KPI METRIC CARDS
+       KPI CARDS (icon box + dense metrics)
     ===================================================== */
-    .metric-card {
+    .kpi-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
         background: #ffffff;
         border: 1px solid #e5e7eb;
+        border-left: 5px solid #0A4174;
         border-radius: 16px;
-        padding: 14px 14px;
-        min-height: 132px;
+        padding: 14px 16px;
+        min-height: 92px;
         height: 100%;
         box-shadow: 0px 2px 8px rgba(15, 23, 42, 0.04);
-        display: flex;
-        flex-direction: column;
     }
 
-    .metric-card.no-sub {
+    .kpi-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 15px;
+        display: flex;
         align-items: center;
         justify-content: center;
-        text-align: center;
+        flex-shrink: 0;
     }
 
-    .metric-card.no-sub .metric-value {
-        font-size: 34px;
-        margin-top: 4px;
+    .kpi-body {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        min-width: 0;
     }
 
-    .metric-title {
+    .kpi-title {
         font-size: 12.5px;
-        color: #334155;
+        color: #475569;
         font-weight: 800;
-        margin-bottom: 6px;
-        line-height: 1.25;
+        line-height: 1.2;
     }
 
-    .metric-value {
-        font-size: 22px;
+    .kpi-value {
+        font-size: 29px;
         font-weight: 900;
         color: #0f172a;
-        line-height: 1.15;
-        letter-spacing: 0.2px;
+        line-height: 1.05;
+        letter-spacing: -0.3px;
         white-space: nowrap;
     }
 
-    .metric-sub {
+    .kpi-sub {
         font-size: 11px;
         color: #64748b;
-        margin-top: auto;
-        padding-top: 8px;
+        margin-top: 2px;
     }
 
-    .metric-up { color: #16a34a; font-weight: 800; }
-    .metric-down { color: #dc2626; font-weight: 800; }
+    .kpi-up { color: #16a34a; font-weight: 800; }
+    .kpi-down { color: #dc2626; font-weight: 800; }
 
 
     /* =====================================================
@@ -412,11 +418,37 @@ def load_css():
 
 
     /* =====================================================
-       MEAN / TOP-2-BOX TOGGLE (segmented control & radio)
+       MEAN / TOP-2-BOX TOGGLE — capsule / pill, single row
     ===================================================== */
-    div[data-testid="stSegmentedControl"] button {
-        border-radius: 10px !important;
-        font-weight: 700 !important;
+    section[data-testid="stSidebar"] div[data-testid="stSegmentedControl"] {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.18);
+        border-radius: 999px !important;
+        padding: 3px !important;
+    }
+
+    section[data-testid="stSidebar"] div[data-testid="stSegmentedControl"] > div {
+        gap: 0 !important;
+        flex-wrap: nowrap !important;
+    }
+
+    section[data-testid="stSidebar"] div[data-testid="stSegmentedControl"] button {
+        border-radius: 999px !important;
+        border: none !important;
+        background: transparent !important;
+        color: #cbd5e1 !important;
+        font-weight: 800 !important;
+        font-size: 13px !important;
+        padding: 6px 10px !important;
+        flex: 1 1 0 !important;
+        white-space: nowrap !important;
+    }
+
+    section[data-testid="stSidebar"] div[data-testid="stSegmentedControl"] button[aria-checked="true"],
+    section[data-testid="stSidebar"] div[data-testid="stSegmentedControl"] button[kind="segmented_controlActive"] {
+        background: #0b5ba7 !important;
+        color: #ffffff !important;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.25) !important;
     }
 
 
@@ -485,17 +517,19 @@ def load_css():
        SMALL RESPONSIVE ADJUSTMENT
     ===================================================== */
     @media (max-width: 1500px) {
-        .metric-card { padding: 12px 12px; min-height: 128px; }
-        .metric-value { font-size: 19px; }
-        .metric-title { font-size: 11.5px; margin-bottom: 5px; }
-        .metric-sub { font-size: 10px; }
+        .kpi-card { padding: 12px 13px; min-height: 88px; gap: 11px; }
+        .kpi-icon { width: 48px; height: 48px; }
+        .kpi-value { font-size: 24px; }
+        .kpi-title { font-size: 11.5px; }
+        .kpi-sub { font-size: 10px; }
         .page-title { font-size: 27px; }
         .chart-title { font-size: 14px; }
     }
 
     @media (max-width: 1280px) {
-        .metric-value { font-size: 17px; }
-        .metric-title { font-size: 11px; }
+        .kpi-value { font-size: 21px; }
+        .kpi-title { font-size: 11px; }
+        .kpi-icon { width: 44px; height: 44px; }
     }
 
     </style>

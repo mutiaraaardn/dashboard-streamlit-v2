@@ -1,66 +1,59 @@
 import streamlit as st
 
+from components.theme import ICON
 
-def metric_card(title, value, sub_text="vs previous period", delta_text=None, delta_type="up", accent=None):
-    """A KPI metric card. `delta_text` renders a coloured up/down indicator."""
-    delta_class = "metric-up" if delta_type == "up" else "metric-down"
+
+def kpi_card(icon, title, value, sub_text=None, accent=None, delta_text=None, delta_type="up"):
+    """Dense KPI card: a large coloured icon box on the left, metrics on the right.
+
+    `icon` is a Material Symbols name (e.g. "groups"). `accent` is a hex colour;
+    it tints the icon, the left border and the icon background.
+    """
+    accent = accent or ICON["dark"]
+    delta_class = "kpi-up" if delta_type == "up" else "kpi-down"
     delta_html = f"<span class='{delta_class}'>{delta_text}</span>" if delta_text else ""
 
-    accent_style = f"border-top:4px solid {accent};" if accent else ""
+    sub_html = ""
+    if (sub_text and str(sub_text).strip()) or delta_html:
+        joiner = " &nbsp; " if (sub_text and delta_html) else ""
+        sub_html = f'<div class="kpi-sub">{sub_text or ""}{joiner}{delta_html}</div>'
 
-    # Hide the sub row when there is neither sub text nor a delta.
-    # Without a sub row: centre the card content and enlarge the value.
-    if (sub_text and sub_text.strip()) or delta_html:
-        sub_html = f'<div class="metric-sub">{sub_text} &nbsp; {delta_html}</div>'
-        card_class = "metric-card"
-    else:
-        sub_html = ""
-        card_class = "metric-card no-sub"
+    icon_html = (
+        f"<span style=\"font-family:'Material Symbols Rounded';font-size:30px;line-height:1;"
+        f"color:{accent};font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24;\">{icon}</span>"
+    )
 
-    st.markdown(f"""
-    <div class="{card_class}" style="{accent_style}">
-        <div class="metric-title">{title}</div>
-        <div class="metric-value">{value}</div>
-        {sub_html}
+    st.markdown(
+        f"""
+    <div class="kpi-card" style="border-left-color:{accent};">
+        <div class="kpi-icon" style="background:{accent}1a;">{icon_html}</div>
+        <div class="kpi-body">
+            <div class="kpi-title">{title}</div>
+            <div class="kpi-value">{value}</div>
+            {sub_html}
+        </div>
     </div>
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )
 
 
-def comparison_card(title, xyz_value, comp_value, unit="", higher_is_better=True, accent=None):
-    """KPI card that shows Bank XYZ value with a delta vs the competitor."""
+def comparison_card(icon, title, xyz_value, comp_value, unit="", higher_is_better=True, accent=None):
+    """KPI card showing the Bank XYZ value with a delta vs the competitor."""
     try:
         gap = float(xyz_value) - float(comp_value)
     except (TypeError, ValueError):
         gap = None
 
     if gap is None:
-        delta_text = None
-        delta_type = "up"
+        delta_text, delta_type = None, "up"
     else:
         ahead = (gap >= 0) if higher_is_better else (gap <= 0)
         arrow = "▲" if gap >= 0 else "▼"
-        delta_text = f"{arrow} {abs(gap):.2f} vs competitor"
+        delta_text = f"{arrow} {abs(gap):.2f} vs comp."
         delta_type = "up" if ahead else "down"
 
     value_text = f"{xyz_value}{unit}" if xyz_value is not None else "-"
-    metric_card(
-        title,
-        value_text,
-        sub_text=f"competitor: {comp_value}{unit}" if comp_value is not None else "",
-        delta_text=delta_text,
-        delta_type=delta_type,
-        accent=accent,
-    )
-
-
-def chart_card_header(title, subtitle=None, icon_html=""):
-    """Render the title/subtitle header used inside chart containers."""
-    st.markdown(
-        f'<div class="chart-title">{icon_html}{title}</div>',
-        unsafe_allow_html=True,
-    )
-    if subtitle:
-        st.markdown(
-            f'<div class="chart-subtitle">{subtitle}</div>',
-            unsafe_allow_html=True,
-        )
+    sub = f"competitor: {comp_value}{unit}" if comp_value is not None else ""
+    kpi_card(icon, title, value_text, sub_text=sub, accent=accent,
+             delta_text=delta_text, delta_type=delta_type)
