@@ -124,10 +124,10 @@ def diverging_bar(scores_df, mode="Mean", height=None, top_n=None):
             x=df["gap"],
             orientation="h",
             marker_color=colors,
-            text=[f"{g:+.1f}{unit}" if mode == "Top-2-Box" else f"{g:+.2f}" for g in df["gap"]],
+            text=[f"{g:+.2f}{unit}" for g in df["gap"]],
             textposition="outside",
             cliponaxis=False,
-            hovertemplate="<b>%{y}</b><br>Gap (XYZ − competitor): %{x:+.2f}<extra></extra>",
+            hovertemplate="<b>%{y}</b><br>Gap (XYZ vs competitor): %{x:+.2f}" + unit + "<extra></extra>",
         )
     )
     fig = base_layout(fig, height=height, margin=dict(l=10, r=50, t=30, b=30))
@@ -272,10 +272,12 @@ def dumbbell(df, height=300):
         )
     )
 
+    max_x = float(pd.concat([df["actual"], df["tolerance"]]).max())
     fig = base_layout(fig, height=height, showlegend=True,
-                      margin=dict(l=10, r=30, t=40, b=30))
-    fig.update_xaxes(title="Minutes")
-    fig.update_yaxes(title=None)
+                      margin=dict(l=10, r=45, t=50, b=40))
+    fig.update_xaxes(title="Minutes", range=[0, max_x * 1.18] if max_x else [0, 1])
+    fig.update_yaxes(title=None, automargin=True)
+    fig.update_layout(yaxis=dict(range=[-0.6, len(df) - 0.4]))
     return fig
 
 

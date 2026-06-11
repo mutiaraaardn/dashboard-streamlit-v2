@@ -45,7 +45,7 @@ def render_kpis(df, labels, mode):
 
 
 def render_scorecard(df, labels, mode):
-    box = chart_card("Branch Scorecard — NPS, CSI & Facility",
+    box = chart_card("Branch Scorecard: NPS, CSI & Facility",
                      "Outcome scores per branch (darker = stronger within each column)",
                      icon=("table_rows", "darkest", 18))
     table = T.branch_metric_table(df, labels, mode, min_n=8, top_branches=20)
@@ -94,7 +94,7 @@ def render_electronic(df, labels, mode):
 
 
 def render_ranking(df, labels, mode):
-    box = chart_card("Facility Attribute Ranking", "Bank XYZ vs competitor — sorted by Bank XYZ score",
+    box = chart_card("Facility Attribute Ranking", "Bank XYZ vs competitor, sorted by Bank XYZ score",
                      icon=("bar_chart", "dark", 18))
     paired = translate_df(T.get_paired_scores(df, BRANCH_PREFIX, labels, mode))
     if paired.empty:
@@ -135,7 +135,7 @@ def render_insights(df, labels, mode):
         <ul style="list-style:none; padding-left:0; margin:0;
                    display:grid; grid-template-columns:repeat(2, 1fr); gap:10px 36px;">
             <li>{mi("emoji_events", ICON["dark"])}Top branch by NPS: {best_txt}.</li>
-            <li>{mi("warning", ICON["mid"])}Lowest branch by NPS: {worst_txt} — prioritise for review.</li>
+            <li>{mi("warning", ICON["mid"])}Lowest branch by NPS: {worst_txt} (prioritise for review).</li>
             <li>{mi("thumb_up", ICON["teal"])}Strongest facility vs competitor: <b>{strong}</b>.</li>
             <li>{mi("trending_down", ICON["darkest"])}Weakest facility vs competitor: <b>{weak}</b>.</li>
         </ul>
@@ -147,7 +147,7 @@ def render_insights(df, labels, mode):
 
 def render_branch(df, labels, mode):
     load_icon_font()
-    page_header("Branch", "Physical environment and facility quality across Bank XYZ branches vs the competitor")
+    page_header("Branch Experience", "Physical environment and facility quality across Bank XYZ branches vs the competitor")
     render_kpis(df, labels, mode)
 
     spacer(28)

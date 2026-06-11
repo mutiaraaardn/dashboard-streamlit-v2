@@ -58,7 +58,7 @@ def render_kpis(df, labels, mode, cfg, name):
 
 
 def render_detail(df, labels, mode, cfg, name):
-    box = chart_card(f"{name} — Attribute Detail", "Score per attribute", icon=("insights", "dark", 18))
+    box = chart_card(f"{name}: Attribute Detail", "Score per attribute", icon=("insights", "dark", 18))
     scores, paired = _selected_scores(df, labels, mode, cfg)
     scores = translate_df(scores)
     if scores.empty:
@@ -67,11 +67,11 @@ def render_detail(df, labels, mode, cfg, name):
         plot(box, charts.grouped_bar(scores, mode=mode))
     else:
         plot(box, charts.single_bar(scores, mode=mode))
-        caption(box, "No competitor benchmark exists for this touchpoint — Bank XYZ only.")
+        caption(box, "No competitor benchmark exists for this touchpoint (Bank XYZ only).")
 
 
 def render_tornado(df, labels, mode, cfg, name):
-    box = chart_card(f"{name} — Gap Tornado", "Bank XYZ minus competitor per attribute",
+    box = chart_card(f"{name}: Gap Tornado", "Bank XYZ minus competitor per attribute",
                      icon=("swap_vert", "teal", 18))
     if not cfg["paired"]:
         empty_state(box, "Gap tornado requires a competitor benchmark (not available here)."); return
@@ -115,14 +115,14 @@ def render_waiting(df):
     data = pd.DataFrame(rows)
     if data.empty:
         empty_state(box); return
-    plot(box, charts.dumbbell(data, height=260))
+    plot(box, charts.dumbbell(data, height=300))
     breaches = data[data["actual"] > data["tolerance"]]["label"].tolist()
     caption(box, (f"Threshold breached at: {', '.join(breaches)}." if breaches
                   else "Actual waiting time stays within the tolerated threshold."))
 
 
 def render_emotion(df, labels):
-    box = chart_card("Emotional Response", "Mean score per emotion — positive (blue) vs negative (red)",
+    box = chart_card("Emotional Response", "Mean score per emotion: positive (blue) vs negative (red)",
                      icon=("mood", "teal", 18))
     cols = group_columns(df, "T_I1A")
     xyz_cols = [c for c in cols if T._benchmark_side(labels.get(c, "")) == "XYZ"]
@@ -184,7 +184,7 @@ def render_insights(df, labels, mode):
 
 def render_touchpoint(df, labels, mode):
     load_icon_font()
-    page_header("Touchpoint", "Service-quality deep dive across the six touchpoints — XYZ vs competitor")
+    page_header("Touchpoint Experience", "Service-quality deep dive across the six touchpoints (XYZ vs competitor)")
 
     name = st.selectbox("Select a touchpoint", list(TOUCHPOINTS.keys()), index=0)
     cfg = TOUCHPOINTS[name]
