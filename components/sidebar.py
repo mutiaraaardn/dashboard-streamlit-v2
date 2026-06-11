@@ -98,6 +98,16 @@ def _reset_filters(page):
 
 @st.dialog("Filters")
 def filter_dialog(df, page):
+    st.markdown("**Aggregate metric**")
+    st.segmented_control(
+        "Aggregate metric",
+        options=["Mean", "Top-2-Box"],
+        default="Mean",
+        key=METRIC_MODE_KEY,
+        label_visibility="collapsed",
+    )
+    st.markdown("<hr style='margin:14px 0;border-top:1px solid #e5e7eb;'>", unsafe_allow_html=True)
+
     for col in PAGE_FILTERS.get(page, []):
         _render_filter(df, col)
 
@@ -144,22 +154,14 @@ def render_sidebar(df):
 
         st.markdown("<hr>", unsafe_allow_html=True)
 
-        st.markdown("**Aggregate metric**")
-        st.segmented_control(
-            "Aggregate metric",
-            options=["Mean", "Top-2-Box"],
-            default="Mean",
-            key=METRIC_MODE_KEY,
-            label_visibility="collapsed",
-        )
-
-        st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
-
         page_filter_cols = PAGE_FILTERS.get(page, [])
         active = sum(1 for c in page_filter_cols if st.session_state.get(FILTER_KEYS[c]))
+        mode = get_metric_mode()
         btn_label = f"▤  Filters ({active})" if active else "▤  Filters"
         if st.button(btn_label, use_container_width=True):
             filter_dialog(df, page)
+
+        st.caption(f"Aggregate metric: **{mode}**")
 
         st.markdown(
             """
