@@ -223,6 +223,26 @@ def branch_metric_table(df, labels, mode="Mean", min_n=1, top_branches=None, bra
     return pd.DataFrame(rows)
 
 
+def city_metric_table(df, labels, mode="Mean", city_col="KABKOTA"):
+    """Per-city/regency outcome scores: NPS, CSI, respondent and branch counts."""
+    if city_col not in df.columns:
+        return pd.DataFrame()
+    rows = []
+    for c in df[city_col].dropna().astype(str).unique():
+        if c.strip() == "":
+            continue
+        sub = df[df[city_col].astype(str) == c]
+        rows.append({
+            "city": c,
+            "province": sub["PROV"].dropna().astype(str).iloc[0] if "PROV" in sub.columns and not sub["PROV"].dropna().empty else "",
+            "NPS": nps(sub["G1A_num"]) if "G1A_num" in sub.columns else None,
+            "CSI": aggregate_series(sub["E1A_num"], mode) if "E1A_num" in sub.columns else None,
+            "n": len(sub),
+            "branches": sub["CABANG"].dropna().nunique() if "CABANG" in sub.columns else 0,
+        })
+    return pd.DataFrame(rows)
+
+
 def branch_touchpoint_matrix(df, labels, touchpoints, mode="Mean", min_n=8, top_branches=20, branch_col="CABANG"):
     """Branch × 6-touchpoint average score matrix (rows = branches)."""
     if branch_col not in df.columns:
@@ -243,11 +263,21 @@ def branch_touchpoint_matrix(df, labels, touchpoints, mode="Mean", min_n=8, top_
 
 
 def get_single_scores(df, prefix, labels, mode="Mean", drop_overall=False):
-    """Return DataFrame[attribute, score] for a single-series group (no competitor)."""
+    """Return DataFrame[attribute, score] for a single-series group (no competitor).
+
+    Two columns in a group can clean to the same label (e.g. T_SL1 has a CS-desk
+    and a teller-desk "Pinpad dapat berfungsi dengan baik", the latter carrying a
+    pandas '.1' suffix). On a within-group collision we keep the raw label (with
+    its '.N') so the rows stay distinct and don't get summed by the chart.
+    """
     records = []
-    cols = group_columns(df, prefix)
-    for col in cols:
-        attr = clean_label(labels.get(col, col))
+    seen = set()
+    for col in group_columns(df, prefix):
+        raw = str(labels.get(col, col))
+        attr = clean_label(raw)
+        if attr in seen:
+            attr = re.sub(r"\s*-\s*(XYZ|kompetitor)\s*$", "", raw, flags=re.IGNORECASE).strip()
+        seen.add(attr)
         records.append({"attribute": attr, "score": aggregate_series(df[col], mode), "code": col})
     out = pd.DataFrame(records).dropna(subset=["score"]).reset_index(drop=True)
     if drop_overall and not out.empty:
