@@ -44,6 +44,13 @@ TENURE_MAP = {
     "5 tahun atau lebih": "≥ 5 years",
 }
 TENURE_ORDER = ["1–3 months", "3–11 months", "1–2 years", "3–4 years", "≥ 5 years"]
+TENURE_ORDER_RAW = [
+    "1 bulan s/d 3 bulan",
+    "3 bulan s/d 11 bulan",
+    "1 tahun s/d 2 tahun 11 bulan",
+    "3 tahun s/d 4 tahun 11 bulan",
+    "5 tahun atau lebih",
+]
 
 FREQUENCY_MAP = {
     "1 minggu 2 kali atau lebih": "≥ 2× a week",
@@ -52,6 +59,12 @@ FREQUENCY_MAP = {
     "1 bulan sekali": "Once a month",
 }
 FREQUENCY_ORDER = ["≥ 2× a week", "Once a week", "Once every 2 weeks", "Once a month"]
+FREQUENCY_ORDER_RAW = [
+    "1 minggu 2 kali atau lebih",
+    "1 minggu sekali",
+    "2 minggu sekali",
+    "1 bulan sekali",
+]
 
 OCCUPATION_MAP = {
     "Pegawai/Karyawan Swasta": "Private Employee",
