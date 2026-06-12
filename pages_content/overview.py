@@ -6,6 +6,7 @@ branch-level map (click a branch to see its NPS and CSI).
 
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
 
 from components.cards import kpi_card, comparison_card
@@ -169,6 +170,32 @@ def render_touchpoint_scores(overall, mode):
     caption(box, "Mean Bank XYZ score for each of the six touchpoints across all selected branches.")
 
 
+def render_nps_breakdown(df):
+    box = chart_card("NPS Breakdown", "Promoters, passives, and detractors",
+                     icon=("donut_large", "dark", 18))
+    series = df["G1A_num"] if "G1A_num" in df.columns else None
+    if series is None or series.dropna().empty:
+        empty_state(box); return
+    promoters, passives, detractors = T.nps_breakdown(series)
+
+    # Legend ordered Detractors -> Passives -> Promoters (pie legend follows label order).
+    labels = ["Detractors (0-6)", "Passives (7-8)", "Promoters (9-10)"]
+    values = [detractors, passives, promoters]
+    colors = ["#BDD8E9", "#49769F", "#0A4174"]
+
+    fig = go.Figure(go.Pie(
+        labels=labels, values=values, hole=0.6, sort=False, direction="clockwise",
+        marker=dict(colors=colors, line=dict(color="white", width=2)),
+        text=[f"{v:g}%" for v in values], textinfo="text", textposition="auto",
+        hovertemplate="<b>%{label}</b><br>%{text}<extra></extra>",
+    ))
+    fig = base_layout(fig, height=330, margin=dict(l=10, r=10, t=20, b=40), showlegend=True)
+    fig.update_layout(legend=dict(orientation="h", yanchor="top", y=-0.02,
+                                  xanchor="center", x=0.5))
+    plot(box, fig)
+    caption(box, "Share of respondents by NPS category, based on the 0–10 likelihood-to-recommend score.")
+
+
 def render_insights(df, overall):
     nps_xyz = T.nps(df["G1A_num"]) if "G1A_num" in df.columns else None
     nps_comp = T.nps(df["G1C_num"]) if "G1C_num" in df.columns else None
@@ -211,9 +238,14 @@ def render_overview(df, labels, mode):
     spacer(28)
     render_map(df, labels, mode)
 
-    # Overall touchpoint assessment for Bank XYZ branches, below the map.
+    # Overall touchpoint assessment for Bank XYZ branches, below the map,
+    # with the NPS breakdown donut beside it on the right.
     spacer()
-    render_touchpoint_scores(overall, mode)
+    col_tp, col_nps = st.columns([3, 2])
+    with col_tp:
+        render_touchpoint_scores(overall, mode)
+    with col_nps:
+        render_nps_breakdown(df)
 
     spacer()
     render_insights(df, overall)
